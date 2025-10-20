@@ -21,7 +21,7 @@ if credentials_json:
    
 else:
     cred_file=os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    credentials = service_account.Credentials.from_service_account_info(cred_file)
+    credentials = service_account.Credentials.from_service_account_file(cred_file)
 PROJECT = os.getenv("GCP_PROJECT")
 REGION = os.getenv("GCP_REGION", "us-central1")
 vertexai.init(project=PROJECT, location=REGION, credentials=credentials)
