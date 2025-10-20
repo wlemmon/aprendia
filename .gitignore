@@ -43,7 +43,7 @@ out/
 .env.production.local
 
 # Audio files
-backend/static_audio/
+# backend/static_audio/
 
 # IDE
 .vscode/
