@@ -16,7 +16,7 @@ def build_title_prompt(
     
     conversation_type_descriptions = {
         "internal_dialogue": "internal dialogue",
-        "narration": "narration",
+        "first_person": "1st person narrative",
         "third_person": "3rd person narrative",
         "dialogue": "dialogue"
     }
@@ -109,7 +109,7 @@ def build_new_story_prompt(
     
     conversation_type_descriptions = {
         "internal_dialogue": "internal dialogue (thoughts of a single character)",
-        "narration": "narration for observer's language acquisition (describing events)",
+        "first_person": "1st person narrative (story told from 'I' perspective)",
         "third_person": "story told from 3rd person omniscient narrator",
         "dialogue": "dialogue between two people"
     }
@@ -167,7 +167,7 @@ def build_next_chapter_prompt(
     
     conversation_type_descriptions = {
         "internal_dialogue": "internal dialogue (thoughts of a single character)",
-        "narration": "narration for observer's language acquisition (describing events)",
+        "first_person": "1st person narrative (story told from 'I' perspective)",
         "third_person": "story told from 3rd person omniscient narrator",
         "dialogue": "dialogue between two people"
     }

@@ -169,7 +169,7 @@ export default function CreateStoryModal({ onClose, onCreated }) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="internal_dialogue">Internal Dialogue</option>
-                <option value="narration">Narration</option>
+                <option value="first_person">1st Person</option>
                 <option value="third_person">3rd Person Narrator</option>
                 <option value="dialogue">Dialogue Between Two People</option>
               </select>
