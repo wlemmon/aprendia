@@ -18,4 +18,5 @@ def save_audio_bytes(locale: str, text: str, audio_bytes: bytes) -> str:
     fpath = p / fname
     with open(fpath, "wb") as f:
         f.write(audio_bytes)
-    return str(fpath)
+    # Return URL path instead of file path
+    return f"/audio/{locale}/{fname}"

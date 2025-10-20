@@ -32,7 +32,8 @@ export default function StudyDeck({ studiable, onBack }) {
       const currentSentence = sentences[currentIndex];
       const audioPath = showingFront ? currentSentence.target_audio : currentSentence.source_audio;
       if (audioPath) {
-        audioRef.current.src = `/api${audioPath}`;
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+        audioRef.current.src = `${backendUrl}${audioPath}`;
         audioRef.current.play().catch(err => console.error('Audio play error:', err));
       }
     }
