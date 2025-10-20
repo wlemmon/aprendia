@@ -2,6 +2,34 @@
 Gemini prompt templates for story chapter and quiz generation.
 """
 
+def build_translation_prompt(
+    story: str,
+    source_locale: str,
+    target_locale: str,
+) -> str:
+    """
+    Build a prompt for translating a story to a new language.
+    
+    Returns a prompt that instructs Gemini to translate a story line by line.
+    """
+    
+    prompt = f"""Translate this story line by line, returning a sentence-level translation of the original story. Each sentence should appear on a new line.
+
+REQUIREMENTS:
+- Source language: {source_locale}
+- Target language: {target_locale}
+
+OUTPUT FORMAT:
+- Each sentence on a separate line
+
+INPUT STORY:
+{story}
+
+"""
+    
+    return prompt
+    
+
 def build_new_story_prompt(
     source_locale: str,
     target_locale: str,
@@ -16,7 +44,7 @@ def build_new_story_prompt(
     Build a prompt for creating the first chapter of a new story.
     
     Returns a prompt that instructs Gemini to create a story chapter with
-    sentences in the format: "source_text|target_text"
+    sentences.
     """
     
     conversation_type_descriptions = {
@@ -44,16 +72,12 @@ REQUIREMENTS:
 - Target audience age: {age_desc}
 - Topic: {topic}
 - Story format: {conv_desc}
-- Source language: {source_locale}
-- Target language: {target_locale}
 - Sentence length: {min_sentence_length} to {max_sentence_length} words per sentence
 - The story should be grounded in real-life scenarios
 - Make it engaging and suitable for spanning multiple chapters
 
 OUTPUT FORMAT:
 - Each sentence on a separate line
-- Format: source_text|target_text
-- Example: "Hello, how are you?|Hola, ¿cómo estás?"
 - Create 8-12 sentences for this chapter
 - Ensure vocabulary and grammar are appropriate for {language_level} level
 
@@ -108,16 +132,12 @@ REQUIREMENTS FOR NEXT CHAPTER:
 - Target audience age: {age_desc}
 - Topic: {topic}
 - Story format: {conv_desc}
-- Source language: {source_locale}
-- Target language: {target_locale}
 - Sentence length: {min_sentence_length} to {max_sentence_length} words per sentence
 - Continue the story naturally from where it left off
 - Introduce new vocabulary and grammar appropriate for {language_level} level
 
 OUTPUT FORMAT:
 - Each sentence on a separate line
-- Format: source_text|target_text
-- Example: "Hello, how are you?|Hola, ¿cómo estás?"
 - Create 8-12 sentences for this chapter
 - Maintain consistency with the previous story
 
@@ -170,10 +190,13 @@ QUESTION FORMAT EXAMPLES:
    Answer: "said"
 
 OUTPUT FORMAT:
-- Each question-answer pair on a separate line
-- Format: question|answer
-- Example: "Let's put the drawing on the what?|the refrigerator"
-- Create exactly 5 question-answer pairs
+- Alternating lines: question on one line, answer on the next line
+- Example:
+  Let's put the drawing on the what?
+  the refrigerator
+  I'm a little busy today. John <BLANK>.
+  said
+- Create exactly 5 question-answer pairs (10 lines total)
 - Focus on testing the most important vocabulary and grammar from the chapter
 
 Create 5 quiz questions now:

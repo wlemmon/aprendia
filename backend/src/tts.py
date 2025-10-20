@@ -1,7 +1,7 @@
 import hashlib, os
 from pathlib import Path
 
-AUDIO_BASE = "./app/static_audio"
+AUDIO_BASE = "./static_audio"
 
 def text_hash_filename(locale: str, text: str) -> str:
     h = hashlib.sha256((locale + text).encode()).hexdigest()[:16]

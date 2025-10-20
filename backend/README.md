@@ -23,12 +23,13 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment instructions.
 1. **Backend Setup**:
 ```bash
 cd backend
-python3 -m venv venv
+python3.10 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip3.10 install -r requirements.txt
 cp .env.example .env
 # Add your OPENAI_API_KEY to .env
-python api_main.py
+python3.10 api_main.py
+# or uvicorn api_main:app --reload
 ```
 
 2. **Frontend Setup** (in a new terminal):

@@ -6,11 +6,17 @@ from pydantic import BaseModel
 from typing import Optional, List
 import os
 import itertools
+import logging
+from src.models import db, Story, Studiable, SentencePair
+from src.gemini_client import generate_text, synthesize_tts
+from src.tts import save_audio_bytes
+from src.prompts import build_new_story_prompt, build_next_chapter_prompt, build_quiz_prompt, build_translation_prompt
 
-from .models import db, Story, Studiable, SentencePair
-from .gemini_client import generate_text, synthesize_tts
-from .tts import save_audio_bytes
-from .prompts import build_new_story_prompt, build_next_chapter_prompt, build_quiz_prompt
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
 
 app = FastAPI(title="Aprendia API", version="1.0.0")
 
@@ -137,6 +143,7 @@ def create_story(request: CreateStoryRequest, background_tasks: BackgroundTasks)
 @app.get("/stories")
 def list_stories():
     """Get all stories."""
+    logging.info(f"{db}")
     return list(db["stories"].values())
 
 
@@ -322,20 +329,16 @@ def process_chapter(
         
         # Generate story text
         result = generate_text(prompt)
-        studiable.raw_text = result
+        
+        result_trans = generate_text(build_translation_prompt(result, story.source_locale,
+                story.target_locale))
+        studiable.raw_text = result + result_trans
         
         # Parse sentences and generate audio
         sentences = []
-        for order, line in enumerate(result.splitlines()):
-            line = line.strip()
-            if not line or "|" not in line:
-                continue
-            
-            parts = line.split("|", 1)
-            if len(parts) != 2:
-                continue
-            
-            src, tgt = [x.strip() for x in parts]
+        for order, (src, tgt) in enumerate(zip(result.splitlines(), result_trans.splitlines())):
+            src = src.strip()
+            tgt = tgt.strip()
             if not src or not tgt:
                 continue
             
@@ -395,18 +398,18 @@ def process_quiz(
         result = generate_text(prompt)
         studiable.raw_text = result
         
-        # Parse questions and generate audio
+        # Parse questions and generate audio (alternating lines: question, answer, question, answer)
         sentences = []
-        for order, line in enumerate(result.splitlines()):
-            line = line.strip()
-            if not line or "|" not in line:
-                continue
+        lines = [line.strip() for line in result.splitlines() if line.strip()]
+        
+        # Process pairs of lines (question on even index, answer on odd index)
+        for i in range(0, len(lines), 2):
+            if i + 1 >= len(lines):
+                break  # Skip if we don't have a complete pair
             
-            parts = line.split("|", 1)
-            if len(parts) != 2:
-                continue
+            question = lines[i]
+            answer = lines[i + 1]
             
-            question, answer = [x.strip() for x in parts]
             if not question or not answer:
                 continue
             
@@ -426,7 +429,7 @@ def process_quiz(
                 target_text=question,  # Question shown on front
                 source_audio=answer_path,
                 target_audio=question_path,
-                order=order
+                order=i // 2  # Use pair index as order
             )
             db["sentences"][sid] = sp
             sentences.append(sp)
@@ -436,3 +439,10 @@ def process_quiz(
     except Exception as e:
         print(f"Error processing quiz: {e}")
         studiable.metadata["error"] = str(e)
+
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)
