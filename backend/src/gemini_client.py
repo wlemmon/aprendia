@@ -18,18 +18,8 @@ if credentials_json:
     
     # Create the credentials object from the info dictionary
     credentials = service_account.Credentials.from_service_account_info(info)
-    
-    # Pass the credentials object explicitly when creating clients
-    # storage_client = storage.Client(credentials=credentials)
-    # print("Storage client authenticated with JSON from environment variable.")
+   
 else:
-    # Fallback to default ADC search if the custom variable is not found
-    # This is useful for local development with a credentials file.
-    # storage_client = storage.Client()
-    # print("Storage client authenticated with default credentials.")
-    credentials = service_account.Credentials.from_service_account_file(info)
-
-
     cred_file=os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     credentials = service_account.Credentials.from_service_account_info(cred_file)
 PROJECT = os.getenv("GCP_PROJECT")
