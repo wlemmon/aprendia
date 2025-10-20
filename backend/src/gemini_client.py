@@ -1,7 +1,7 @@
 import os
 from google.cloud import texttospeech
 
-
+import json
 import tempfile
 
 def setup_google_credentials():
@@ -19,6 +19,9 @@ def setup_google_credentials():
 
 setup_google_credentials()
 
+import google.auth
+creds, project = google.auth.default()
+print(f"✅ Authenticated as {creds.service_account_email}, project={project}")
 
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel 
