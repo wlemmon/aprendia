@@ -1,3 +1,5 @@
+![Aprendia](images/logo.png "Aprendia")
+
 # Aprendia
 
 A modern web application for conversational language study and learning.
