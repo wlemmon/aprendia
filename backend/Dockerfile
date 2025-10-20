@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create directory for audio files
-RUN mkdir -p static_audio
+COPY static_audio static_audio
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
