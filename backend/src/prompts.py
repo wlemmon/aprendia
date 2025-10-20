@@ -135,7 +135,9 @@ REQUIREMENTS:
 - Story format: {conv_desc}
 - Sentence length: {min_sentence_length} to {max_sentence_length} words per sentence
 - The story should be grounded in real-life scenarios
-- Make it engaging and suitable for spanning multiple chapters
+- Make it engaging and suitable for spanning multiple chapters.
+- No blank lines.
+- Do not include a chapter or story title. simply begin outputing the story content.
 
 OUTPUT FORMAT:
 - Each sentence on a separate line
