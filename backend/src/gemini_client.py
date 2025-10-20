@@ -2,19 +2,30 @@ import os
 from google.cloud import texttospeech
 
 import vertexai
-from vertexai.preview.generative_models import GenerativeModel, Part, Image
+from vertexai.preview.generative_models import GenerativeModel 
 import asyncio
 import aiofiles
+import logging
+import json
 
+from google.oauth2 import service_account
+PROJECT = os.getenv("GCP_PROJECT")
+cred_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+print(cred_json, os.path.exists(cred_json))
+if not os.path.exists(cred_json): # in railway, pass json in 
+    cred_json=json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+    credentials = service_account.Credentials.from_service_account_info(cred_json)
+    PROJECT = os.getenv("GCP_PROJECT")
+    REGION = os.getenv("GCP_REGION", "us-central1")
+    vertexai.init(project=PROJECT, location=REGION, credentials=credentials)
+else:
+    vertexai.init()
 # from google.oauth2 import service_account
 
-PROJECT = os.getenv("GCP_PROJECT")
-# REGION = os.getenv("GCP_REGION", "us-central1")
-import logging
 
 # Initialize the Vertex AI SDK
-vertexai.init(project=PROJECT)
 def generate_text(prompt: str) -> str:
+    
     logging.info(f"generate_text: {prompt}")
     model_name = "gemini-2.5-flash"
     model = GenerativeModel(model_name)

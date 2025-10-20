@@ -45,6 +45,8 @@ out/
 # Audio files
 # backend/static_audio/
 
+socialcue-457922-a27fba41d57b.json
+
 # IDE
 .vscode/
 .idea/
