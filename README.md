@@ -1,4 +1,4 @@
-![Aprendia](images/logo.png "Aprendia")
+![Aprendia](images/banner.png "Aprendia")
 
 # Aprendia
 
