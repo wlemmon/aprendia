@@ -8,12 +8,12 @@ import aiofiles
 
 # from google.oauth2 import service_account
 
-# PROJECT = os.getenv("GCP_PROJECT")
+PROJECT = os.getenv("GCP_PROJECT")
 # REGION = os.getenv("GCP_REGION", "us-central1")
 import logging
 
 # Initialize the Vertex AI SDK
-vertexai.init()
+vertexai.init(project=PROJECT)
 def generate_text(prompt: str) -> str:
     logging.info(f"generate_text: {prompt}")
     model_name = "gemini-2.5-flash"
