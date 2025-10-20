@@ -10,17 +10,32 @@ import json
 
 from google.oauth2 import service_account
 PROJECT = os.getenv("GCP_PROJECT")
-cred_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-print(cred_json, os.path.exists(cred_json))
-if not os.path.exists(cred_json): # in railway, pass json in 
-    cred_json=json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-    credentials = service_account.Credentials.from_service_account_info(cred_json)
-    PROJECT = os.getenv("GCP_PROJECT")
-    REGION = os.getenv("GCP_REGION", "us-central1")
-    vertexai.init(project=PROJECT, location=REGION, credentials=credentials)
+credentials_json = os.environ.get("GCP_CREDENTIALS_JSON")
+
+if credentials_json:
+    # Load the JSON string into a Python object
+    info = json.loads(credentials_json)
+    
+    # Create the credentials object from the info dictionary
+    credentials = service_account.Credentials.from_service_account_info(info)
+    
+    # Pass the credentials object explicitly when creating clients
+    # storage_client = storage.Client(credentials=credentials)
+    # print("Storage client authenticated with JSON from environment variable.")
 else:
-    vertexai.init()
-# from google.oauth2 import service_account
+    # Fallback to default ADC search if the custom variable is not found
+    # This is useful for local development with a credentials file.
+    # storage_client = storage.Client()
+    # print("Storage client authenticated with default credentials.")
+    credentials = service_account.Credentials.from_service_account_file(info)
+
+
+    cred_file=os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    credentials = service_account.Credentials.from_service_account_info(cred_file)
+PROJECT = os.getenv("GCP_PROJECT")
+REGION = os.getenv("GCP_REGION", "us-central1")
+vertexai.init(project=PROJECT, location=REGION, credentials=credentials)
+
 
 
 # Initialize the Vertex AI SDK
