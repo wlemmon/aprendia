@@ -92,22 +92,22 @@ export default function StudyDeck({ studiable, onBack }) {
   const progress = `${currentIndex + 1} / ${sentences.length}`;
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <div className="glass border-b border-white/20 px-6 py-4 flex items-center justify-between">
         <button
           onClick={onBack}
-          className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+          className="px-4 py-2 glass-button text-white rounded-lg"
         >
           ← Back
         </button>
-        <h2 className="text-xl font-semibold text-gray-800">{studiable.title}</h2>
-        <div className="text-gray-600">{progress}</div>
+        <h2 className="text-xl font-semibold text-white">{studiable.title}</h2>
+        <div className="text-white/80">{progress}</div>
       </div>
 
       {/* Flashcard */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl min-h-[400px] flex flex-col">
+        <div className="glass-card rounded-2xl w-full max-w-2xl min-h-[400px] flex flex-col">
           {showingFront ? (
             // Front of card
             <div className="flex-1 flex flex-col items-center justify-center p-8">
@@ -122,13 +122,13 @@ export default function StudyDeck({ studiable, onBack }) {
               </div>
               
               {showTargetText ? (
-                <p className="text-2xl text-gray-800 text-center mb-6">
+                <p className="text-2xl text-white text-center mb-6">
                   {currentSentence.target_text}
                 </p>
               ) : (
                 <button
                   onClick={() => setShowTargetText(true)}
-                  className="px-6 py-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition mb-6"
+                  className="px-6 py-3 glass-button text-white rounded-lg mb-6"
                 >
                   Show Text
                 </button>
@@ -136,7 +136,7 @@ export default function StudyDeck({ studiable, onBack }) {
               
               <button
                 onClick={handleFlip}
-                className="mt-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="mt-auto px-6 py-3 glass-button-primary text-white rounded-lg"
               >
                 Flip to Back
               </button>
@@ -154,33 +154,42 @@ export default function StudyDeck({ studiable, onBack }) {
                 </button>
               </div>
               
-              <p className="text-2xl text-gray-800 text-center mb-8">
+              <p className="text-2xl text-white text-center mb-8">
                 {currentSentence.source_text}
               </p>
               
               {/* Spaced Repetition Buttons */}
-              <div className="flex gap-3 mt-auto">
+              <div className="flex gap-3 mt-auto flex-wrap justify-center">
                 <button
                   onClick={() => handleSpacedRepetition('again')}
-                  className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                  className="px-6 py-3 glass-button text-white rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.6), rgba(220, 38, 38, 0.6))',
+                  }}
                 >
                   Again
                 </button>
                 <button
                   onClick={() => handleSpacedRepetition('hard')}
-                  className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+                  className="px-6 py-3 glass-button text-white rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.6), rgba(234, 88, 12, 0.6))',
+                  }}
                 >
                   Hard
                 </button>
                 <button
                   onClick={() => handleSpacedRepetition('good')}
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                  className="px-6 py-3 glass-button text-white rounded-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.6), rgba(22, 163, 74, 0.6))',
+                  }}
                 >
                   Good
                 </button>
                 <button
                   onClick={() => handleSpacedRepetition('easy')}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="px-6 py-3 glass-button-primary text-white rounded-lg"
                 >
                   Easy
                 </button>

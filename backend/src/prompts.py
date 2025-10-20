@@ -2,6 +2,65 @@
 Gemini prompt templates for story chapter and quiz generation.
 """
 
+def build_title_prompt(
+    topic: str,
+    language_level: str,
+    age_level: str,
+    conversation_type: str
+) -> str:
+    """
+    Build a prompt for generating a story title based on story parameters.
+    
+    Returns a prompt that instructs Gemini to create a short, engaging title.
+    """
+    
+    conversation_type_descriptions = {
+        "internal_dialogue": "internal dialogue",
+        "narration": "narration",
+        "third_person": "3rd person narrative",
+        "dialogue": "dialogue"
+    }
+    
+    age_level_descriptions = {
+        "toddler": "toddler (ages 2-3)",
+        "pre_school": "pre-school (ages 4-5)",
+        "middle_school": "middle school (ages 11-14)",
+        "high_school": "high school (ages 15-18)",
+        "college": "college (ages 18+)"
+    }
+    
+    conv_desc = conversation_type_descriptions.get(conversation_type, conversation_type)
+    age_desc = age_level_descriptions.get(age_level, age_level)
+    
+    prompt = f"""Create a short, engaging title for a language learning story with these characteristics:
+
+STORY PARAMETERS:
+- Topic: {topic}
+- Language level: {language_level} (CEFR)
+- Target audience: {age_desc}
+- Story format: {conv_desc}
+
+REQUIREMENTS:
+- Title should be 3-5 words
+- Make it engaging and relevant to the topic
+- Appropriate for the target audience age
+- Should hint at the story's theme without being too specific
+
+OUTPUT:
+Provide ONLY the title text, nothing else. No quotes, no explanation.
+
+Example titles:
+- "Adventure in Barcelona"
+- "The Lost Passport"
+- "Family Road Trip"
+- "A Day at the Market"
+
+Create the title now:
+"""
+    
+    return prompt
+
+
 def build_translation_prompt(
     story: str,
     source_locale: str,
@@ -31,6 +90,7 @@ INPUT STORY:
     
 
 def build_new_story_prompt(
+    title: str,
     source_locale: str,
     target_locale: str,
     language_level: str,
@@ -70,6 +130,7 @@ def build_new_story_prompt(
 REQUIREMENTS:
 - Language level: {language_level} (CEFR)
 - Target audience age: {age_desc}
+- Story Title: {title}
 - Topic: {topic}
 - Story format: {conv_desc}
 - Sentence length: {min_sentence_length} to {max_sentence_length} words per sentence

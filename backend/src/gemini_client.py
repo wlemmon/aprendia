@@ -25,7 +25,18 @@ def synthesize_tts(locale: str, text: str) -> bytes:
     logging.info(f"synthesize_tts: {text}")
     client = texttospeech.TextToSpeechClient()
     input_text = texttospeech.SynthesisInput(text=text)
-    voice = texttospeech.VoiceSelectionParams(language_code=locale)
+    voice = texttospeech.VoiceSelectionParams(language_code=locale, model_name='en-US-Chirp3-HD-Leda')
     audio_cfg = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
     response = client.synthesize_speech(input=input_text, voice=voice, audio_config=audio_cfg)
     return response.audio_content
+
+
+# async def async_tts_gemini(text, filename, lang='en-US'):
+#     def helper():
+#         return synthesize_tts(lang, text)
+#     # Run the blocking TTS call in a thread
+#     audio_content = await asyncio.to_thread(helper)
+
+#     # Write the file asynchronously
+#     async with aiofiles.open(filename, "wb") as f:
+#         await f.write(audio_content)

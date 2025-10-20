@@ -68,7 +68,7 @@ export default function Home() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-auto bg-gray-50">
+      <main className="flex-1 overflow-auto">
         {selectedStudiable ? (
           // Study Deck View
           <StudyDeck
@@ -85,16 +85,16 @@ export default function Home() {
         ) : (
           // Welcome View
           <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-800 mb-4">
+            <div className="text-center glass-card p-12 rounded-2xl">
+              <h1 className="text-4xl font-bold text-white mb-4">
                 Welcome to Aprendia
               </h1>
-              <p className="text-gray-600 mb-8">
+              <p className="text-white/80 mb-8">
                 Create a new story to start learning
               </p>
               <button
                 onClick={() => setShowCreateStoryModal(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-3 glass-button-primary text-white rounded-lg"
               >
                 Create Your First Story
               </button>

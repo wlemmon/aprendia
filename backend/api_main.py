@@ -10,7 +10,7 @@ import logging
 from src.models import db, Story, Studiable, SentencePair
 from src.gemini_client import generate_text, synthesize_tts
 from src.tts import save_audio_bytes
-from src.prompts import build_new_story_prompt, build_next_chapter_prompt, build_quiz_prompt, build_translation_prompt
+from src.prompts import build_new_story_prompt, build_next_chapter_prompt, build_quiz_prompt, build_translation_prompt, build_title_prompt
 
 logging.basicConfig(
     level=logging.INFO,
@@ -45,7 +45,7 @@ sentence_counter = itertools.count(1)
 
 # Request/Response Models
 class CreateStoryRequest(BaseModel):
-    title: str
+    title: Optional[str] = None
     source_locale: str
     target_locale: str
     language_level: str
@@ -84,11 +84,30 @@ def create_story(request: CreateStoryRequest, background_tasks: BackgroundTasks)
     """
     Create a new story with chapter 1.
     This endpoint creates the story and immediately starts generating chapter 1.
+    If title is not provided, generates one using Gemini.
     """
+    # Generate title if not provided
+    title = request.title
+    if not title or title.strip() == "":
+        try:
+            title_prompt = build_title_prompt(
+                request.topic,
+                request.language_level,
+                request.age_level,
+                request.conversation_type
+            )
+            title = generate_text(title_prompt).strip()
+            # Remove any quotes that Gemini might add
+            title = title.strip('"').strip("'")
+        except Exception as e:
+            print(f"Error generating title: {e}")
+            # Fallback to a default title
+            title = f"{request.topic.capitalize()} Story"
+    
     story_id = next(story_counter)
     story = Story(
         id=story_id,
-        title=request.title,
+        title=title,
         source_locale=request.source_locale,
         target_locale=request.target_locale,
         metadata={
@@ -317,6 +336,7 @@ def process_chapter(
             )
         else:
             prompt = build_new_story_prompt(
+                story.title,
                 story.source_locale,
                 story.target_locale,
                 language_level,
