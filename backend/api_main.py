@@ -8,9 +8,12 @@ import os
 import itertools
 import logging
 from src.models import db, Story, Studiable, SentencePair
-from src.gemini_client import generate_text, synthesize_tts
-from src.tts import save_audio_bytes
+from src.gemini_client import generate_text, synthesize_tts, async_tts_gemini 
+from src.tts import save_audio_bytes, get_audio_fname, get_audio_write_fname
 from src.prompts import build_new_story_prompt, build_next_chapter_prompt, build_quiz_prompt, build_translation_prompt, build_title_prompt
+import asyncio
+from threading import Thread
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,6 +22,10 @@ logging.basicConfig(
 
 
 app = FastAPI(title="Aprendia API", version="1.0.0")
+MAX_CONCURRENT = 5
+
+_background_loop = None
+_tts_semaphore = None
 
 # CORS middleware
 app.add_middleware(
@@ -38,9 +45,9 @@ os.makedirs("static_audio", exist_ok=True)
 app.mount("/audio", StaticFiles(directory="static_audio"), name="audio")
 
 # Counters for IDs
-story_counter = itertools.count(1)
-studiable_counter = itertools.count(1)
-sentence_counter = itertools.count(1)
+story_counter = itertools.count(len(db['stories'])+1)
+studiable_counter = itertools.count(len(db['studiables'])+1)
+sentence_counter = itertools.count(len(db['sentences'])+1)
 
 
 # Request/Response Models
@@ -307,6 +314,38 @@ def get_studiable(studiable_id: int):
     }
 
 
+def _ensure_background_loop():
+    """Ensure there's one global asyncio loop and semaphore for background tasks."""
+    global _background_loop, _tts_semaphore
+    if _background_loop is None:
+        _background_loop = asyncio.new_event_loop()
+        _tts_semaphore = asyncio.Semaphore(MAX_CONCURRENT)
+        Thread(target=_background_loop.run_forever, daemon=True).start()
+    return _background_loop, _tts_semaphore
+
+async def async_synthesize_and_save(locale: str, text: str, save_path: str):
+    """Async wrapper for TTS synthesis + saving with concurrency control."""
+    try:
+        _, sem = _ensure_background_loop()
+        async with sem:
+            # actually synthesize and write
+            fut = await async_tts_gemini(text, save_path, lang=locale)
+            return fut
+    except Exception as e:
+        print(f"[TTS] Error for {locale}: {e}")
+        return None
+    
+def submit_tts_task(locale: str, text: str, save_path: str):
+    """Schedules async TTS task on the background loop (non-blocking)."""
+    loop, _ = _ensure_background_loop()
+    future = asyncio.run_coroutine_threadsafe(
+        async_synthesize_and_save(locale, text, save_path),
+        loop
+    )
+    return future
+
+
+
 # Background processing functions
 def process_chapter(
     studiable: Studiable,
@@ -362,13 +401,20 @@ def process_chapter(
             if not src or not tgt:
                 continue
             
-            # Generate TTS audio
-            src_bytes = synthesize_tts(story.source_locale, src)
-            tgt_bytes = synthesize_tts(story.target_locale, tgt)
-            
             # Save audio files
-            src_path = save_audio_bytes(story.source_locale, src, src_bytes)
-            tgt_path = save_audio_bytes(story.target_locale, tgt, tgt_bytes)
+            src_uri = get_audio_fname(story.source_locale, src)
+            tgt_uri = get_audio_fname(story.target_locale, tgt)
+            
+            src_write_path = get_audio_write_fname(story.source_locale, src)
+            tgt_write_path = get_audio_write_fname(story.target_locale, tgt)
+            
+            # Generate TTS audio
+            fut_src = submit_tts_task(story.source_locale, src, src_write_path)
+            fut_tgt = submit_tts_task(story.target_locale, tgt, tgt_write_path)
+            # src_bytes = synthesize_tts(story.source_locale, src)
+            # tgt_bytes = synthesize_tts(story.target_locale, tgt)
+            
+            
             
             # Create sentence pair
             sid = next(sentence_counter)
@@ -376,8 +422,8 @@ def process_chapter(
                 id=sid,
                 source_text=src,
                 target_text=tgt,
-                source_audio=src_path,
-                target_audio=tgt_path,
+                source_audio=src_uri,
+                target_audio=tgt_uri,
                 order=order
             )
             db["sentences"][sid] = sp

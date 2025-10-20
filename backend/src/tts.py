@@ -12,6 +12,18 @@ def ensure_audio_path(locale: str):
     p.mkdir(parents=True, exist_ok=True)
     return p
 
+def get_audio_fname(locale: str, text: str) -> str:
+    p = ensure_audio_path(locale)
+    fname = text_hash_filename(locale, text)
+    return f"/audio/{locale}/{fname}"
+
+def get_audio_write_fname(locale: str, text: str) -> str:
+    p = ensure_audio_path(locale)
+    fname = text_hash_filename(locale, text)
+    fpath = p / fname
+    return fpath
+
+
 def save_audio_bytes(locale: str, text: str, audio_bytes: bytes) -> str:
     p = ensure_audio_path(locale)
     fname = text_hash_filename(locale, text)
@@ -19,4 +31,4 @@ def save_audio_bytes(locale: str, text: str, audio_bytes: bytes) -> str:
     with open(fpath, "wb") as f:
         f.write(audio_bytes)
     # Return URL path instead of file path
-    return f"/audio/{locale}/{fname}"
+    

@@ -3,6 +3,8 @@ from google.cloud import texttospeech
 
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, Part, Image
+import asyncio
+import aiofiles
 
 # from google.oauth2 import service_account
 
@@ -31,12 +33,12 @@ def synthesize_tts(locale: str, text: str) -> bytes:
     return response.audio_content
 
 
-# async def async_tts_gemini(text, filename, lang='en-US'):
-#     def helper():
-#         return synthesize_tts(lang, text)
-#     # Run the blocking TTS call in a thread
-#     audio_content = await asyncio.to_thread(helper)
+async def async_tts_gemini(text, filename, lang='en-US'):
+    def helper():
+        return synthesize_tts(lang, text)
+    # Run the blocking TTS call in a thread
+    audio_content = await asyncio.to_thread(helper)
 
-#     # Write the file asynchronously
-#     async with aiofiles.open(filename, "wb") as f:
-#         await f.write(audio_content)
+    # Write the file asynchronously
+    async with aiofiles.open(filename, "wb") as f:
+        await f.write(audio_content)
