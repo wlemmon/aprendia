@@ -2,7 +2,7 @@
 
 # Aprendia
 
-A modern web application for conversational language study and learning.
+A modern web application for conversational language study and learning. (faster language compensation and conversion acquisition and retention than duolingo or speak.)
 
 Summary: This scaffold provides a working prototype of Aprendia, a story-based language learning demo app powered by Google Gemini and Google Text-to-Speech (TTS). The backend runs on FastAPI, the frontend on Next.js + TailwindCSS, and all data is stored in a simple in-memory Python dict — no persistence or user accounts. Audio files are stored locally under the backend’s static_audio/ directory.
 
